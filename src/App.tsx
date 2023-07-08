@@ -1,6 +1,6 @@
-import React, { useState, useReducer } from "react";
-import logo from "./logo.svg";
+import React, { useReducer } from "react";
 import "./App.css";
+import { useInterval } from "./hooks/useInterval";
 
 const initialState = { time: "0", secs: 0, enableStart: true };
 type TInitState = typeof initialState;
@@ -15,21 +15,19 @@ const App = () => {
   );
   const { time, secs, enableStart } = state;
 
+  const add1Sec = () => {
+    setState({ secs: secs + 1 });
+  };
+
+  const startCounter = useInterval(add1Sec)
+
   const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setState({ time: e.target.value });
   };
 
-  const startCounter = () => {
-    const id = setInterval((secs) => {
-      setState({ secs: secs + 1 });
-      console.log(secs, 'interval')
-    }, 1000, state.secs);
-    return () => clearInterval(id);
-  };
-
   const startPomodoro = () => {
     setState({ enableStart: false });
-    const stopCounter = startCounter();
+    const stopCounter = startCounter(1000);
     setTimeout(() => {
       setState({ enableStart: true });
       stopCounter();
