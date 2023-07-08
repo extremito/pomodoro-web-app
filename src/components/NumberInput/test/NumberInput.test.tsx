@@ -32,4 +32,17 @@ describe("NumberInput component", () => {
     userEvent.type(screen.getByText(testLabel), "7");
     expect(mockChange).toHaveBeenCalled();
   });
+  
+  test('should disable button', () => {
+    render(
+      <NumberInput
+        id="test"
+        labelText={testLabel}
+        value={testValue}
+        onChange={mockChange}
+        disabled={true}
+      />
+    );
+    expect(screen.getByRole("textbox")).toBeDisabled()
+  })
 });
