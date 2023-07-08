@@ -23,7 +23,7 @@ const getDisplayTitle = (
       return "Remaining rest time";
     }
     case displayWait: {
-      return "Waiting for rest start";
+      return "Waiting for rest to start...";
     }
   }
 };
