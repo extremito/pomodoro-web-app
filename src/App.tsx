@@ -1,6 +1,6 @@
 import React, { useReducer } from "react";
-import "./App.css";
-import { useInterval } from "./hooks/useInterval";
+import './App.scss'
+import useInterval from "./hooks/useInterval";
 
 const initialState = { time: "0", secs: 0, enableStart: true };
 type TInitState = typeof initialState;
@@ -36,9 +36,9 @@ const App = () => {
   };
 
   return (
-    <div className="container">
+    <div className="container-fluid app-container">
       <header>
-        <h1>Pomodoro</h1>
+        <h1 className="text-light text-center">Pomodoro</h1>
       </header>
       <section>
         <label>
