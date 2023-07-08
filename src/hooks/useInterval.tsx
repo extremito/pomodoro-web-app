@@ -1,6 +1,6 @@
 import React, { useRef } from "react";
 
-export const useInterval = (callback: Function) => {
+const useInterval = (callback: Function) => {
   const mutableCb = useRef<unknown>(null);
   mutableCb.current = callback;
 
@@ -13,3 +13,5 @@ export const useInterval = (callback: Function) => {
 
   return startInterval;
 };
+
+export default useInterval
