@@ -5,41 +5,28 @@ import TimerMainButton from "../TimerMainButton";
 describe("TimerMainButton component", () => {
   const callback = jest.fn();
 
-  test("should render button on start pomodoro stage", () => {
-    render(
-      <TimerMainButton
-        callback={callback}
-        started={false}
-        restStage={false}
-        paused={false}
-      />
-    );
-    expect(screen.getByText("Start pomodoro"));
-  });
-
-  test("should render button on stop pomodoro stage", () => {
-    render(
-      <TimerMainButton
-        callback={callback}
-        started={true}
-        restStage={false}
-        paused={false}
-      />
-    );
-    expect(screen.getByText("Stop pomodoro"));
-  });
-
-  test("should render button on pause pomodoro stage", () => {
-    render(
-      <TimerMainButton
-        callback={callback}
-        started={true}
-        restStage={false}
-        paused={true}
-      />
-    );
-    expect(screen.getByText("Continue pomodoro"));
-  });
+  test.each`
+    title                  | started  | restStage | paused
+    ${"Start pomodoro"}    | ${false} | ${false}  | ${false}
+    ${"Stop pomodoro"}     | ${true}  | ${false}  | ${false}
+    ${"Continue pomodoro"} | ${true}  | ${false}  | ${true}
+    ${"Start rest"}        | ${false} | ${true}   | ${false}
+    ${"Stop rest"}         | ${true}  | ${true}   | ${false}
+    ${"Continue rest"}     | ${true}  | ${true}   | ${true}
+  `(
+    "should render $title on button",
+    ({ title, started, restStage, paused }) => {
+      render(
+        <TimerMainButton
+          callback={callback}
+          started={started}
+          restStage={restStage}
+          paused={paused}
+        />
+      );
+      expect(screen.getByText(title)).toBeInTheDocument();
+    }
+  );
 
   test("should execute callback", () => {
     render(

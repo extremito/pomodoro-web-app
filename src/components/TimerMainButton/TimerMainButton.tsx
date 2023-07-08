@@ -26,6 +26,12 @@ const getButtonText = (
     case !started && !paused && restStage: {
       return "Start rest";
     }
+    case started && !paused && restStage: {
+      return "Stop rest";
+    }
+    case started && paused && restStage: {
+      return "Continue rest";
+    }
   }
   return "";
 };
