@@ -2,13 +2,17 @@ import React, { useEffect, useReducer, useRef } from "react";
 import "./App.scss";
 import useInterval from "./hooks/useInterval";
 import TimeDisplay from "./components/TimeDisplay/TimeDisplay";
+import TimerMainButton from "./components/TimerMainButton/TimerMainButton";
 
 const initialState = {
   timeMin: "25",
   secs: 0,
-  enableStart: false,
+  enableStart: true,
   restingMin: "5",
-  pomodoroNum: "",
+  longRestMin: "15",
+  pomodoroNum: "4",
+  elapsedPomodoros: 0,
+  timerPause: false,
 };
 type TInitState = typeof initialState;
 
@@ -20,7 +24,7 @@ const App = () => {
     }),
     initialState
   );
-  const { timeMin, secs, enableStart, restingMin } = state;
+  const { timeMin, secs, enableStart, restingMin, timerPause } = state;
   const stopCounter = useRef<unknown>(null);
 
   const add1Sec = () => {
@@ -44,9 +48,24 @@ const App = () => {
     setState({ pomodoroNum });
   };
 
-  const startPomodoro = () => {
-    setState({ enableStart: false, secs: 0 });
-    stopCounter.current = startCounter(1000);
+  const handleTimerButton = () => {
+    switch (true) {
+      case enableStart: {
+        setState({ enableStart: false, secs: 0 });
+        stopCounter.current = startCounter(1000);
+        break;
+      }
+      case !enableStart && !timerPause: {
+        setState({ timerPause: true });
+        typeof stopCounter.current === "function" && stopCounter.current();
+        break;
+      }
+      case timerPause: {
+        setState({ timerPause: false });
+        stopCounter.current = startCounter(1000);
+        break;
+      }
+    }
   };
 
   useEffect(() => {
@@ -88,14 +107,11 @@ const App = () => {
           </div>
         </form>
         <TimeDisplay seconds={secs} />
-        <button
-          type="button"
-          className="btn btn-light btn-lg"
-          disabled={!enableStart}
-          onClick={startPomodoro}
-        >
-          Start
-        </button>
+        <TimerMainButton
+          callback={handleTimerButton}
+          started={!enableStart}
+          restStage={false}
+        />
       </section>
     </div>
   );
