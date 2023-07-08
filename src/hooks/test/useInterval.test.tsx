@@ -22,4 +22,11 @@ describe("useInterval", () => {
     jest.advanceTimersToNextTimer();
     expect(mockFn).toHaveBeenCalled();
   });
+  
+  test('should clear interval', () => {
+    const { result } = renderHook(() => useInterval(mockFn));
+    const stopTimer = result.current(1000)
+    stopTimer()
+    expect(clearInterval).toHaveBeenCalled();
+  })
 });
