@@ -40,6 +40,7 @@ const App = () => {
     elapsedPomodoros,
     elapsedRests,
     playNotification,
+    longRestMin,
   } = state;
   const stopCounter = useRef<unknown>(null);
   const pomodoroSeconds = timeMin ? parseInt(timeMin) * 60 : 0;
@@ -50,6 +51,12 @@ const App = () => {
       ? "rest-running"
       : "pomodoro-running"
     : "";
+
+  const disablePomodoroTimeSet = !enableStart;
+  const disableRestTimeSet = !enableStart && restStage;
+  const disableStartButton = restStage
+    ? restingSeconds <= secs
+    : pomodoroSeconds <= secs;
 
   const add1Sec = () => {
     setState({ secs: secs + 1 });
@@ -64,12 +71,17 @@ const App = () => {
 
   const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const time = e.target.value;
-    setState({ timeMin: time, enableStart: parseInt(time) > 0 });
+    setState({ timeMin: time });
   };
 
   const handleRestingTime = (e: React.ChangeEvent<HTMLInputElement>) => {
     const restingMin = e.target.value;
     setState({ restingMin });
+  };
+
+  const handleLongRestTime = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const longRestMin = e.target.value;
+    setState({ longRestMin });
   };
 
   const handlePomodoroNumber = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -80,6 +92,7 @@ const App = () => {
   const handleTimerButton = () => {
     switch (true) {
       case enableStart: {
+        typeof stopCounter.current === "function" && stopCounter.current();
         setState({ enableStart: false, secs: 0, playNotification: false });
         stopCounter.current = startCounter(1000);
         break;
@@ -109,6 +122,7 @@ const App = () => {
         restStage: true,
         elapsedPomodoros: elapsedPomodoros + 1,
         playNotification: true,
+        secs: 0,
       });
     } else if (restStage && secs === restingSeconds) {
       typeof stopCounter.current === "function" && stopCounter.current();
@@ -116,6 +130,7 @@ const App = () => {
         enableStart: true,
         restStage: false,
         elapsedRests: elapsedRests + 1,
+        secs: 0,
       });
     }
   }, [secs]);
@@ -133,12 +148,21 @@ const App = () => {
               labelText="Set time in minutes"
               onChange={handleTimeChange}
               value={timeMin}
+              disabled={disablePomodoroTimeSet}
             />
             <NumberInput
               id="resting-time"
               labelText="Set resting time in minutes"
               onChange={handleRestingTime}
               value={restingMin}
+              disabled={disableRestTimeSet}
+            />
+            <NumberInput
+              id="longresting-time"
+              labelText="Set long resting time in minutes"
+              onChange={handleLongRestTime}
+              value={longRestMin}
+              disabled={disableRestTimeSet}
             />
             <NumberInput
               id="pomodoro-number"
@@ -154,12 +178,13 @@ const App = () => {
           displayPomodoro={!restStage}
           displayRest={restStage}
         />
-        <div className="d-flex flex-column">
+        <div className="d-flex flex-column align-items-center">
           <TimerMainButton
             callback={handleTimerButton}
             started={!enableStart}
             paused={timerPause}
             restStage={restStage}
+            disabled={disableStartButton}
           />
           <Button onClick={resetAllValues}>Reset</Button>
           <Button onClick={onClickSilence} disabled={!playNotification}>
