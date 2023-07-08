@@ -1,5 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
+import formatInt from "../../utils/format/formatInt";
 
 interface TimeDisplay {
   seconds?: number;
@@ -13,7 +14,7 @@ const TimeDisplay = ({ seconds = 0 }: TimeDisplay) => {
       <div className="card-body">
         <h5 className="card-title">Elapsed time</h5>
         <p className="card-text">
-          {minutes} : {secondsLeft}
+          {minutes} : {formatInt(secondsLeft, 2)}
         </p>
       </div>
     </div>
