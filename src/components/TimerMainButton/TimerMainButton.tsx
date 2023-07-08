@@ -1,4 +1,5 @@
 import React, { MouseEventHandler } from "react";
+import "./TimerMainButton.scss";
 
 interface ITimerMainButton {
   callback: MouseEventHandler<HTMLButtonElement>;
@@ -21,6 +22,9 @@ const getButtonText = (
     }
     case started && !paused && !restStage: {
       return "Stop pomodoro";
+    }
+    case !started && !paused && restStage: {
+      return "Start rest";
     }
   }
   return "";
