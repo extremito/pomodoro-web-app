@@ -1,23 +1,41 @@
 import React, { MouseEventHandler } from "react";
 
 interface ITimerMainButton {
-  started: boolean;
-  restStage: boolean;
   callback: MouseEventHandler<HTMLButtonElement>;
+  started: boolean;
+  paused: boolean;
+  restStage: boolean;
 }
+
+const getButtonText = (
+  started: boolean,
+  paused: boolean,
+  restStage: boolean
+) => {
+  switch (true) {
+    case !started && !paused && !restStage: {
+      return "Start pomodoro";
+    }
+    case started && paused && !restStage: {
+      return "Continue pomodoro";
+    }
+    case started && !paused && !restStage: {
+      return "Stop pomodoro";
+    }
+  }
+  return "";
+};
 
 const TimerMainButton = ({
   callback,
   started,
+  paused,
   restStage,
 }: ITimerMainButton) => {
-  const buttonTimerText = started ? "Stop pomodoro" : "Start pomodoro";
+  const buttonTimerText = getButtonText(started, paused, restStage);
+
   return (
-    <button
-      type="button"
-      className="btn btn-light btn-lg"
-      onClick={callback}
-    >
+    <button type="button" className="timer-button" onClick={callback}>
       {buttonTimerText}
     </button>
   );
