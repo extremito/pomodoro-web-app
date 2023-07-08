@@ -6,6 +6,7 @@ interface ITimerMainButton {
   started: boolean;
   paused: boolean;
   restStage: boolean;
+  disabled: boolean;
 }
 
 const getButtonText = (
@@ -41,11 +42,17 @@ const TimerMainButton = ({
   started,
   paused,
   restStage,
+  disabled,
 }: ITimerMainButton) => {
   const buttonTimerText = getButtonText(started, paused, restStage);
 
   return (
-    <button type="button" className="timer-button" onClick={callback}>
+    <button
+      type="button"
+      className="timer-button"
+      onClick={callback}
+      disabled={disabled}
+    >
       {buttonTimerText}
     </button>
   );

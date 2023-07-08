@@ -22,6 +22,7 @@ describe("TimerMainButton component", () => {
           started={started}
           restStage={restStage}
           paused={paused}
+          disabled={true}
         />
       );
       expect(screen.getByText(title)).toBeInTheDocument();
@@ -35,9 +36,23 @@ describe("TimerMainButton component", () => {
         started={false}
         restStage={false}
         paused={false}
+        disabled={false}
       />
     );
     userEvent.click(screen.getByText("Start pomodoro"));
     expect(callback).toHaveBeenCalled();
+  });
+
+  test("should disable button", () => {
+    render(
+      <TimerMainButton
+        callback={callback}
+        started={false}
+        restStage={false}
+        paused={false}
+        disabled={true}
+      />
+    );
+    expect(screen.getByText("Start pomodoro")).toBeDisabled()
   });
 });
