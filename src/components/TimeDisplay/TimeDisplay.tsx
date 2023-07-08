@@ -3,12 +3,15 @@ import PropTypes from "prop-types";
 import formatInt from "../../utils/format/formatInt";
 
 interface TimeDisplay {
+  timeset: number;
   seconds?: number;
 }
 
-const TimeDisplay = ({ seconds = 0 }: TimeDisplay) => {
-  const secondsLeft = seconds % 60;
-  const minutes = Math.trunc(seconds / 60);
+const TimeDisplay = ({ timeset, seconds = 0 }: TimeDisplay) => {
+  const timeLeft = timeset - seconds;
+  const secondsLeft = timeLeft % 60;
+  const minutes = Math.trunc(timeLeft / 60);
+  
   return (
     <div className="card">
       <div className="card-body">
