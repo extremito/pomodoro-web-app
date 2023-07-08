@@ -3,24 +3,4 @@
   height: 100vh;
 }
 
-.timer-button {
-  background-color: #48abe0;
-  color: white;
-  border: none;
-  padding: 5px;
-  font-size: 31px;
-  height: 130px;
-  width: 130px;
-  box-shadow: 0 2px 4px darkslategray;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
 
-.timer-button:hover {
-  background-color: #65b9e6;
-}
-
-.timer-button:active {
-  box-shadow: 0 0 2px darkslategray;
-  transform: translateY(2px);
-}

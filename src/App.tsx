@@ -3,6 +3,8 @@ import "./App.scss";
 import useInterval from "./hooks/useInterval";
 import TimeDisplay from "./components/TimeDisplay/TimeDisplay";
 import TimerMainButton from "./components/TimerMainButton/TimerMainButton";
+import NumberInput from "./components/NumberInput/NumberInput";
+import ResetButton from "./components/ResetButton/ResetButton";
 
 const initialState = {
   timeMin: "25",
@@ -13,6 +15,9 @@ const initialState = {
   pomodoroNum: "4",
   elapsedPomodoros: 0,
   timerPause: false,
+  restStage: false,
+  elapsedRests: 0,
+  playNotification: false,
 };
 type TInitState = typeof initialState;
 
@@ -24,14 +29,33 @@ const App = () => {
     }),
     initialState
   );
-  const { timeMin, secs, enableStart, restingMin, timerPause } = state;
+  const {
+    timeMin,
+    secs,
+    enableStart,
+    restingMin,
+    timerPause,
+    restStage,
+    pomodoroNum,
+    elapsedPomodoros,
+    elapsedRests,
+    playNotification,
+  } = state;
   const stopCounter = useRef<unknown>(null);
+  const pomodoroSeconds = timeMin ? parseInt(timeMin) * 60 : 0;
+  const restingSeconds = restingMin ? parseInt(restingMin) * 60 : 0;
+  const displayTime = restStage ? restingSeconds : pomodoroSeconds;
 
   const add1Sec = () => {
     setState({ secs: secs + 1 });
   };
 
   const startCounter = useInterval(add1Sec);
+
+  const resetAllValues = () => {
+    typeof stopCounter.current === "function" && stopCounter.current();
+    setState(initialState);
+  };
 
   const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const time = e.target.value;
@@ -51,7 +75,7 @@ const App = () => {
   const handleTimerButton = () => {
     switch (true) {
       case enableStart: {
-        setState({ enableStart: false, secs: 0 });
+        setState({ enableStart: false, secs: 0, playNotification: false });
         stopCounter.current = startCounter(1000);
         break;
       }
@@ -69,9 +93,21 @@ const App = () => {
   };
 
   useEffect(() => {
-    if (secs === parseInt(timeMin) * 60) {
+    if (secs === pomodoroSeconds && !restStage) {
       typeof stopCounter.current === "function" && stopCounter.current();
-      setState({ enableStart: true });
+      setState({
+        enableStart: true,
+        restStage: true,
+        elapsedPomodoros: elapsedPomodoros + 1,
+        playNotification: true,
+      });
+    } else if (restStage && secs === restingSeconds) {
+      typeof stopCounter.current === "function" && stopCounter.current();
+      setState({
+        enableStart: true,
+        restStage: false,
+        elapsedRests: elapsedRests + 1,
+      });
     }
   }, [secs]);
 
@@ -83,35 +119,43 @@ const App = () => {
       <section>
         <form>
           <div className="form-row">
-            <label htmlFor="pomodoro-time">Set time in minutes</label>
-            <input
+            <NumberInput
               id="pomodoro-time"
-              className="form-control"
+              labelText="Set time in minutes"
               onChange={handleTimeChange}
               value={timeMin}
             />
-            <label htmlFor="resting-time">Set resting time in minutes</label>
-            <input
+            <NumberInput
               id="resting-time"
-              className="form-control"
+              labelText="Set resting time in minutes"
               onChange={handleRestingTime}
               value={restingMin}
             />
-            <label htmlFor="pomodoro-number">Set pomodoros</label>
-            <input
+            <NumberInput
               id="pomodoro-number"
-              className="form-control"
+              labelText="Set pomodoros"
               onChange={handlePomodoroNumber}
-              value={restingMin}
+              value={pomodoroNum}
             />
           </div>
         </form>
-        <TimeDisplay seconds={secs} />
-        <TimerMainButton
-          callback={handleTimerButton}
-          started={!enableStart}
-          restStage={false}
-        />
+        <TimeDisplay seconds={secs} timeset={displayTime} />
+        <div className="d-flex flex-column">
+          <TimerMainButton
+            callback={handleTimerButton}
+            started={!enableStart}
+            paused={timerPause}
+            restStage={false}
+          />
+          <ResetButton onClick={resetAllValues} />
+        </div>
+        {playNotification && (
+          <audio
+            preload="auto"
+            src="https://cdn.pixabay.com/…/04/audio_46cecde167.mp3"
+            crossOrigin="anonymous"
+          />
+        )}
       </section>
     </div>
   );
