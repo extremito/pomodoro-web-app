@@ -4,7 +4,7 @@ import useInterval from "./hooks/useInterval";
 import TimeDisplay from "./components/TimeDisplay/TimeDisplay";
 import TimerMainButton from "./components/TimerMainButton/TimerMainButton";
 import NumberInput from "./components/NumberInput/NumberInput";
-import ResetButton from "./components/ResetButton/ResetButton";
+import Button from "./components/Button/Button";
 
 const initialState = {
   timeMin: "25",
@@ -45,6 +45,11 @@ const App = () => {
   const pomodoroSeconds = timeMin ? parseInt(timeMin) * 60 : 0;
   const restingSeconds = restingMin ? parseInt(restingMin) * 60 : 0;
   const displayTime = restStage ? restingSeconds : pomodoroSeconds;
+  const backgroundClass = !enableStart
+    ? restStage
+      ? "rest-running"
+      : "pomodoro-running"
+    : "";
 
   const add1Sec = () => {
     setState({ secs: secs + 1 });
@@ -92,6 +97,10 @@ const App = () => {
     }
   };
 
+  const onClickSilence = () => {
+    setState({ playNotification: false });
+  };
+
   useEffect(() => {
     if (secs === pomodoroSeconds && !restStage) {
       typeof stopCounter.current === "function" && stopCounter.current();
@@ -112,7 +121,7 @@ const App = () => {
   }, [secs]);
 
   return (
-    <div className="container-fluid app-container">
+    <div className={`container-fluid app-container ${backgroundClass}`}>
       <header>
         <h1 className="text-light text-center">Pomodoro</h1>
       </header>
@@ -139,20 +148,29 @@ const App = () => {
             />
           </div>
         </form>
-        <TimeDisplay seconds={secs} timeset={displayTime} />
+        <TimeDisplay
+          seconds={secs}
+          timeset={displayTime}
+          displayPomodoro={!restStage}
+          displayRest={restStage}
+        />
         <div className="d-flex flex-column">
           <TimerMainButton
             callback={handleTimerButton}
             started={!enableStart}
             paused={timerPause}
-            restStage={false}
+            restStage={restStage}
           />
-          <ResetButton onClick={resetAllValues} />
+          <Button onClick={resetAllValues}>Reset</Button>
+          <Button onClick={onClickSilence} disabled={!playNotification}>
+            Silence
+          </Button>
         </div>
         {playNotification && (
           <audio
+            autoPlay
             preload="auto"
-            src="https://cdn.pixabay.com/…/04/audio_46cecde167.mp3"
+            src="https://cdn.pixabay.com/audio/2021/08/04/audio_46cecde167.mp3"
             crossOrigin="anonymous"
           />
         )}
