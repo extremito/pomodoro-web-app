@@ -1,19 +1,22 @@
 import React, { MouseEventHandler } from "react";
 
-interface IResetButton {
+interface IButton {
+  children: string;
   onClick: MouseEventHandler<HTMLButtonElement>;
+  disabled?: boolean;
 }
 
-const ResetButton = ({ onClick }: IResetButton) => {
+const Button = ({ children, onClick, disabled = false }: IButton) => {
   return (
     <button
       type="button"
       className="btn btn-light btn-lg btn-block"
       onClick={onClick}
+      disabled={disabled}
     >
-      Reset
+      {children}
     </button>
   );
 };
 
-export default ResetButton;
+export default Button;
