@@ -18,6 +18,10 @@ const initialState = {
   restStage: false,
   elapsedRests: 0,
   playNotification: false,
+  longRestStage: false,
+  waitStage: false,
+  waitTimeMins: 1,
+  skippedRestMins: 0,
 };
 type TInitState = typeof initialState;
 
@@ -41,11 +45,17 @@ const App = () => {
     elapsedRests,
     playNotification,
     longRestMin,
+    longRestStage,
+    waitStage,
+    waitTimeMins,
+    skippedRestMins,
   } = state;
   const stopCounter = useRef<unknown>(null);
   const pomodoroSeconds = timeMin ? parseInt(timeMin) * 60 : 0;
   const restingSeconds = restingMin ? parseInt(restingMin) * 60 : 0;
-  const displayTime = restStage ? restingSeconds : pomodoroSeconds;
+  const longRestSeconds = longRestMin ? parseInt(longRestMin) * 60 : 0;
+  const waitSeconds = waitTimeMins * 60;
+  const displayTime = longRestStage ? longRestSeconds : restStage ? restingSeconds : pomodoroSeconds;
   const backgroundClass = !enableStart
     ? restStage
       ? "rest-running"
@@ -91,9 +101,33 @@ const App = () => {
 
   const handleTimerButton = () => {
     switch (true) {
-      case enableStart: {
+      case enableStart && !restStage && !waitStage: {
         typeof stopCounter.current === "function" && stopCounter.current();
         setState({ enableStart: false, secs: 0, playNotification: false });
+        stopCounter.current = startCounter(1000);
+        break;
+      }
+      case enableStart && !restStage && waitStage: {
+        typeof stopCounter.current === "function" && stopCounter.current();
+        setState({
+          enableStart: false,
+          secs: 0,
+          playNotification: false,
+          waitStage: false,
+          restStage: true,
+        });
+        stopCounter.current = startCounter(1000);
+        break;
+      }
+      case enableStart && restStage && !waitStage: {
+        typeof stopCounter.current === "function" && stopCounter.current();
+        setState({
+          enableStart: false,
+          secs: 0,
+          playNotification: false,
+          waitStage: false,
+          restStage: false,
+        });
         stopCounter.current = startCounter(1000);
         break;
       }
@@ -115,22 +149,46 @@ const App = () => {
   };
 
   useEffect(() => {
-    if (secs === pomodoroSeconds && !restStage) {
-      typeof stopCounter.current === "function" && stopCounter.current();
+    if (secs === pomodoroSeconds && !restStage && !waitStage) {
       setState({
         enableStart: true,
-        restStage: true,
+        restStage: false,
+        waitStage: true,
         elapsedPomodoros: elapsedPomodoros + 1,
         playNotification: true,
         secs: 0,
+        longRestStage: !!(elapsedPomodoros % parseInt(pomodoroNum)),
       });
-    } else if (restStage && secs === restingSeconds) {
+    } else if (secs === waitSeconds && waitStage) {
+      const _longRestStage = !!(elapsedPomodoros % parseInt(pomodoroNum));
+      setState({
+        enableStart: true,
+        restStage: false,
+        waitStage: false,
+        elapsedPomodoros: elapsedPomodoros + 1,
+        playNotification: false,
+        secs: 0,
+        longRestStage: _longRestStage,
+        skippedRestMins:
+          skippedRestMins +
+          (_longRestStage ? parseInt(longRestMin) : parseInt(restingMin)),
+      });
+    } else if (restStage && !longRestStage && secs === restingSeconds) {
       typeof stopCounter.current === "function" && stopCounter.current();
       setState({
         enableStart: true,
         restStage: false,
         elapsedRests: elapsedRests + 1,
         secs: 0,
+      });
+    } else if (restStage && longRestStage && secs === longRestSeconds) {
+      typeof stopCounter.current === "function" && stopCounter.current();
+      setState({
+        enableStart: true,
+        restStage: false,
+        elapsedRests: elapsedRests + 1,
+        secs: 0,
+        longRestStage: false,
       });
     }
   }, [secs]);
