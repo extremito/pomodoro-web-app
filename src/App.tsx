@@ -5,6 +5,7 @@ import TimeDisplay from "./components/TimeDisplay/TimeDisplay";
 import TimerMainButton from "./components/TimerMainButton/TimerMainButton";
 import NumberInput from "./components/NumberInput/NumberInput";
 import Button from "./components/Button/Button";
+import SimpleCard from "./components/SimpleCard/SimpleCard";
 
 const initialState = {
   timeMin: "25",
@@ -55,13 +56,18 @@ const App = () => {
   const restingSeconds = restingMin ? parseInt(restingMin) * 60 : 0;
   const longRestSeconds = longRestMin ? parseInt(longRestMin) * 60 : 0;
   const waitSeconds = waitTimeMins * 60;
-  const displayTime = longRestStage ? longRestSeconds : restStage ? restingSeconds : pomodoroSeconds;
+  const displayTime = longRestStage
+    ? longRestSeconds
+    : restStage
+    ? restingSeconds
+    : pomodoroSeconds;
   const backgroundClass = !enableStart
     ? restStage
       ? "rest-running"
       : "pomodoro-running"
     : "";
-
+  const restingStage = restStage || longRestStage;
+  const pomodoroStage = !restingStage && !waitStage;
   const disablePomodoroTimeSet = !enableStart;
   const disableRestTimeSet = !enableStart && restStage;
   const disableStartButton = restStage
@@ -101,32 +107,35 @@ const App = () => {
 
   const handleTimerButton = () => {
     switch (true) {
-      case enableStart && !restStage && !waitStage: {
+      case enableStart && !restingStage && !waitStage: {
         typeof stopCounter.current === "function" && stopCounter.current();
         setState({ enableStart: false, secs: 0, playNotification: false });
         stopCounter.current = startCounter(1000);
         break;
       }
-      case enableStart && !restStage && waitStage: {
+      case enableStart && !restingStage && waitStage: {
+        const _longRestStage = !(elapsedPomodoros % parseInt(pomodoroNum));
         typeof stopCounter.current === "function" && stopCounter.current();
         setState({
           enableStart: false,
           secs: 0,
           playNotification: false,
           waitStage: false,
-          restStage: true,
+          restStage: !_longRestStage,
+          longRestStage: _longRestStage,
         });
-        stopCounter.current = startCounter(1000);
         break;
       }
-      case enableStart && restStage && !waitStage: {
+      case enableStart && restingStage && !waitStage: {
+        const _longRestStage = !(elapsedPomodoros % parseInt(pomodoroNum));
         typeof stopCounter.current === "function" && stopCounter.current();
         setState({
           enableStart: false,
           secs: 0,
           playNotification: false,
           waitStage: false,
-          restStage: false,
+          restStage: !_longRestStage,
+          longRestStage: _longRestStage,
         });
         stopCounter.current = startCounter(1000);
         break;
@@ -160,9 +169,9 @@ const App = () => {
         longRestStage: !!(elapsedPomodoros % parseInt(pomodoroNum)),
       });
     } else if (secs === waitSeconds && waitStage) {
-      const _longRestStage = !!(elapsedPomodoros % parseInt(pomodoroNum));
+      const _longRestStage = !(elapsedPomodoros % parseInt(pomodoroNum));
       setState({
-        enableStart: true,
+        enableStart: false,
         restStage: false,
         waitStage: false,
         elapsedPomodoros: elapsedPomodoros + 1,
@@ -181,7 +190,7 @@ const App = () => {
         elapsedRests: elapsedRests + 1,
         secs: 0,
       });
-    } else if (restStage && longRestStage && secs === longRestSeconds) {
+    } else if (!restStage && longRestStage && secs === longRestSeconds) {
       typeof stopCounter.current === "function" && stopCounter.current();
       setState({
         enableStart: true,
@@ -230,11 +239,16 @@ const App = () => {
             />
           </div>
         </form>
+        <SimpleCard
+          title="Skipped rest time"
+          text={skippedRestMins.toString()}
+        />
         <TimeDisplay
           seconds={secs}
           timeset={displayTime}
-          displayPomodoro={!restStage}
-          displayRest={restStage}
+          displayPomodoro={pomodoroStage}
+          displayRest={restingStage}
+          displayWait={waitStage}
         />
         <div className="d-flex flex-column align-items-center">
           <TimerMainButton
@@ -243,6 +257,7 @@ const App = () => {
             paused={timerPause}
             restStage={restStage}
             disabled={disableStartButton}
+            waiting={waitStage}
           />
           <Button onClick={resetAllValues}>Reset</Button>
           <Button onClick={onClickSilence} disabled={!playNotification}>
