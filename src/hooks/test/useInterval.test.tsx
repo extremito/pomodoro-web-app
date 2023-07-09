@@ -4,6 +4,7 @@ import useInterval from "../useInterval";
 jest.useFakeTimers();
 
 const mockFn = jest.fn();
+const spyClearInterval = jest.spyOn(window, "clearInterval");
 
 describe("useInterval", () => {
   afterEach(() => {
@@ -22,11 +23,11 @@ describe("useInterval", () => {
     jest.advanceTimersToNextTimer();
     expect(mockFn).toHaveBeenCalled();
   });
-  
-  test('should clear interval', () => {
+
+  test("should clear interval", () => {
     const { result } = renderHook(() => useInterval(mockFn));
-    const stopTimer = result.current(1000)
-    stopTimer()
-    expect(clearInterval).toHaveBeenCalled();
-  })
+    const stopTimer = result.current(1000);
+    stopTimer();
+    expect(spyClearInterval).toHaveBeenCalled();
+  });
 });
