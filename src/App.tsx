@@ -53,8 +53,12 @@ const App = () => {
   } = state;
   const stopCounter = useRef<unknown>(null);
   const pomodoroSeconds = timeMin ? parseInt(timeMin) * 60 : 0;
-  const restingSeconds = restingMin ? parseInt(restingMin) * 60 : 0;
-  const longRestSeconds = longRestMin ? parseInt(longRestMin) * 60 : 0;
+  const restingSeconds = restingMin
+    ? parseInt(restingMin) * 60 + skippedRestMins * 60
+    : 0;
+  const longRestSeconds = longRestMin
+    ? parseInt(longRestMin) * 60 + skippedRestMins * 60
+    : 0;
   const waitSeconds = waitTimeMins * 60;
   const displayTime = longRestStage
     ? longRestSeconds
@@ -106,6 +110,14 @@ const App = () => {
   };
 
   const handleTimerButton = () => {
+    console.log(
+      "button timer",
+      enableStart,
+      restingStage,
+      waitStage,
+      restStage,
+      longRestStage
+    );
     switch (true) {
       case enableStart && !restingStage && !waitStage: {
         typeof stopCounter.current === "function" && stopCounter.current();
@@ -114,10 +126,7 @@ const App = () => {
         break;
       }
       case enableStart && !restingStage && waitStage: {
-        const _longRestStage = !(
-          (elapsedPomodoros + 1) %
-          parseInt(pomodoroNum)
-        );
+        const _longRestStage = !(elapsedPomodoros % parseInt(pomodoroNum));
         typeof stopCounter.current === "function" && stopCounter.current();
         setState({
           enableStart: false,
@@ -127,13 +136,11 @@ const App = () => {
           restStage: !_longRestStage,
           longRestStage: _longRestStage,
         });
+        stopCounter.current = startCounter(1000)
         break;
       }
       case enableStart && restingStage && !waitStage: {
-        const _longRestStage = !(
-          (elapsedPomodoros + 1) %
-          parseInt(pomodoroNum)
-        );
+        const _longRestStage = !(elapsedPomodoros % parseInt(pomodoroNum));
         typeof stopCounter.current === "function" && stopCounter.current();
         setState({
           enableStart: false,
@@ -175,12 +182,12 @@ const App = () => {
         longRestStage: false,
       });
     } else if (secs === waitSeconds && waitStage) {
-      const _longRestStage = !((elapsedPomodoros + 1) % parseInt(pomodoroNum));
+      const _longRestStage = !(elapsedPomodoros % parseInt(pomodoroNum));
+      console.log(_longRestStage, elapsedPomodoros, pomodoroNum);
       setState({
         enableStart: false,
         restStage: false,
         waitStage: false,
-        elapsedPomodoros: elapsedPomodoros + 1,
         playNotification: false,
         secs: 0,
         longRestStage: false,
@@ -197,6 +204,7 @@ const App = () => {
         restStage: false,
         elapsedRests: elapsedRests + 1,
         secs: 0,
+        skippedRestMins: 0,
       });
     } else if (!restStage && longRestStage && secs === longRestSeconds) {
       typeof stopCounter.current === "function" && stopCounter.current();
@@ -207,6 +215,7 @@ const App = () => {
         secs: 0,
         longRestStage: false,
         waitStage: false,
+        skippedRestMins: 0,
       });
     }
   }, [secs]);
