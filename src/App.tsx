@@ -114,7 +114,10 @@ const App = () => {
         break;
       }
       case enableStart && !restingStage && waitStage: {
-        const _longRestStage = !(elapsedPomodoros % parseInt(pomodoroNum));
+        const _longRestStage = !(
+          (elapsedPomodoros + 1) %
+          parseInt(pomodoroNum)
+        );
         typeof stopCounter.current === "function" && stopCounter.current();
         setState({
           enableStart: false,
@@ -127,7 +130,10 @@ const App = () => {
         break;
       }
       case enableStart && restingStage && !waitStage: {
-        const _longRestStage = !(elapsedPomodoros % parseInt(pomodoroNum));
+        const _longRestStage = !(
+          (elapsedPomodoros + 1) %
+          parseInt(pomodoroNum)
+        );
         typeof stopCounter.current === "function" && stopCounter.current();
         setState({
           enableStart: false,
@@ -158,7 +164,7 @@ const App = () => {
   };
 
   useEffect(() => {
-    if (secs === pomodoroSeconds && !restStage && !waitStage) {
+    if (secs === pomodoroSeconds && !restingStage && !waitStage) {
       setState({
         enableStart: true,
         restStage: false,
@@ -166,10 +172,10 @@ const App = () => {
         elapsedPomodoros: elapsedPomodoros + 1,
         playNotification: true,
         secs: 0,
-        longRestStage: !!(elapsedPomodoros % parseInt(pomodoroNum)),
+        longRestStage: false,
       });
     } else if (secs === waitSeconds && waitStage) {
-      const _longRestStage = !(elapsedPomodoros % parseInt(pomodoroNum));
+      const _longRestStage = !((elapsedPomodoros + 1) % parseInt(pomodoroNum));
       setState({
         enableStart: false,
         restStage: false,
@@ -177,7 +183,7 @@ const App = () => {
         elapsedPomodoros: elapsedPomodoros + 1,
         playNotification: false,
         secs: 0,
-        longRestStage: _longRestStage,
+        longRestStage: false,
         skippedRestMins:
           skippedRestMins +
           (_longRestStage ? parseInt(longRestMin) : parseInt(restingMin)),
@@ -186,6 +192,8 @@ const App = () => {
       typeof stopCounter.current === "function" && stopCounter.current();
       setState({
         enableStart: true,
+        longRestStage: false,
+        waitStage: false,
         restStage: false,
         elapsedRests: elapsedRests + 1,
         secs: 0,
@@ -198,6 +206,7 @@ const App = () => {
         elapsedRests: elapsedRests + 1,
         secs: 0,
         longRestStage: false,
+        waitStage: false,
       });
     }
   }, [secs]);
