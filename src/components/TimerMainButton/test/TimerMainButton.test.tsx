@@ -6,22 +6,24 @@ describe("TimerMainButton component", () => {
   const callback = jest.fn();
 
   test.each`
-    title                  | started  | restStage | paused
-    ${"Start pomodoro"}    | ${false} | ${false}  | ${false}
-    ${"Stop pomodoro"}     | ${true}  | ${false}  | ${false}
-    ${"Continue pomodoro"} | ${true}  | ${false}  | ${true}
-    ${"Start rest"}        | ${false} | ${true}   | ${false}
-    ${"Stop rest"}         | ${true}  | ${true}   | ${false}
-    ${"Continue rest"}     | ${true}  | ${true}   | ${true}
+    title                  | started  | restStage | paused   | waiting
+    ${"Start pomodoro"}    | ${false} | ${false}  | ${false} | ${false}
+    ${"Stop pomodoro"}     | ${true}  | ${false}  | ${false} | ${false}
+    ${"Continue pomodoro"} | ${true}  | ${false}  | ${true}  | ${false}
+    ${"Start rest"}        | ${false} | ${true}   | ${false} | ${false}
+    ${"Start rest"}        | ${false} | ${false}  | ${false} | ${true}
+    ${"Stop rest"}         | ${true}  | ${true}   | ${false} | ${false}
+    ${"Continue rest"}     | ${true}  | ${true}   | ${true}  | ${false}
   `(
     "should render $title on button",
-    ({ title, started, restStage, paused }) => {
+    ({ title, started, restStage, paused, waiting }) => {
       render(
         <TimerMainButton
           callback={callback}
           started={started}
           restStage={restStage}
           paused={paused}
+          waiting={waiting}
           disabled={true}
         />
       );
@@ -36,6 +38,7 @@ describe("TimerMainButton component", () => {
         started={false}
         restStage={false}
         paused={false}
+        waiting={false}
         disabled={false}
       />
     );
@@ -50,9 +53,10 @@ describe("TimerMainButton component", () => {
         started={false}
         restStage={false}
         paused={false}
+        waiting={false}
         disabled={true}
       />
     );
-    expect(screen.getByText("Start pomodoro")).toBeDisabled()
+    expect(screen.getByText("Start pomodoro")).toBeDisabled();
   });
 });
