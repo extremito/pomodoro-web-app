@@ -1,6 +1,31 @@
-# Getting Started with Create React App
+# React Application - Pomdoro
+
+## Application Stack
+
+- View - React
+- Model - React context
+- Routing - React router
+- Processing - Service workers
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+
+## Application design
+
+### This application will have 2 pages:
+
+![Application pages](/docs/diagrams/pomodoroGral.drawio.png)
+
+### State management:
+
+![State management](/docs/diagrams/VariableHandling.drawio.svg)
+
+### UI Page details:
+
+![UI Details](/docs/diagrams/PagesUIDetails.drawio.svg)
+
+## Timer loggic flow chart:
+
+![Timer service worker flow](/docs/diagrams/TimerLogic.drawio.svg)
 
 ## Available Scripts
 
