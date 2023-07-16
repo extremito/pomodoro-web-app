@@ -23,9 +23,25 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 ![UI Details](/docs/diagrams/PagesUIDetails.drawio.svg)
 
-## Timer loggic flow chart:
+### Timer loggic flow chart:
 
 ![Timer service worker flow](/docs/diagrams/TimerLogic.drawio.svg)
+
+### Configuration page - UI components logic
+
+![Configuration page components logic](/docs/diagrams/ConfigurationPageComponents.drawio.svg)
+
+### Index page - Main button logic
+
+![Main button logic](/docs/diagrams/MainButtonSimpleLogic.drawio.svg)
+
+### Index page - Main display logic
+
+![Main display logic chart](/docs/diagrams/MainDisplayLogic.drawio.svg)
+
+### Pomodoro application - Main logic
+
+![Pomodoro main logic](/docs/diagrams/PomodoroMainLogic.drawio.svg)
 
 ## Available Scripts
 
