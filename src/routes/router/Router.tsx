@@ -1,11 +1,17 @@
 import React from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import Routes from "../Routes";
+import Root from "../../pages/root/Root";
+import PomodoroPage from "../../pages/pomodoro-page/PomodoroPage";
+import MainPage from "../../pages/main-page/MainPage";
 
 const browserRouter = createBrowserRouter([
   {
     path: "/",
-    element: <Routes />,
+    element: <Root />,
+    children: [{
+      path: '/',
+      element: <MainPage />
+    }]
   },
 ]);
 

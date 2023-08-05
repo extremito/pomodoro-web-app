@@ -1,13 +1,9 @@
 import React from "react";
 import "./App.scss";
-import Router from "./routes/router/router";
+import Router from "./routes/router/Router";
 
 const App = () => {
-  return (
-    <div className="container-fluid app-container">
-      <Router />
-    </div>
-  );
+  return <Router />;
 };
 
 export default App;
